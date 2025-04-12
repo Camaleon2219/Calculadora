@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iPhone Style Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .calculator {
+      width: 420px;
+      background-color: #000;
+      border-radius: 40px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    .display {
+      color: white;
+      font-size: 72px;
+      text-align: right;
+      padding: 30px 15px;
+      word-wrap: break-word;
+      min-height: 80px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    button {
+      font-size: 40px;
+      padding: 30px;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      background-color: #333;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s ease;
+    }
+
+    button:active {
+      background-color: #555;
+      transform: scale(0.95);
+    }
+
+    .orange {
+      background-color: #f69906;
+    }
+
+    .gray {
+      background-color: #a5a5a5;
+      color: black;
+    }
+
+    .wide {
+      grid-column: span 2;
+      border-radius: 50px;
+    }
+  </style>
+</head>
+<body>
+  <audio id="click-sound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+
+  <div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <button class="gray" onclick="playClick(); clearDisplay()">AC</button>
+      <button class="gray" onclick="playClick(); toggleSign()">±</button>
+      <button class="gray" onclick="playClick(); percent()">%</button>
+      <button class="orange" onclick="playClick(); setOperation('/')">÷</button>
+
+      <button onclick="playClick(); appendNumber('7')">7</button>
+      <button onclick="playClick(); appendNumber('8')">8</button>
+      <button onclick="playClick(); appendNumber('9')">9</button>
+      <button class="orange" onclick="playClick(); setOperation('*')">×</button>
+
+      <button onclick="playClick(); appendNumber('4')">4</button>
+      <button onclick="playClick(); appendNumber('5')">5</button>
+      <button onclick="playClick(); appendNumber('6')">6</button>
+      <button class="orange" onclick="playClick(); setOperation('-')">−</button>
+
+      <button onclick="playClick(); appendNumber('1')">1</button>
+      <button onclick="playClick(); appendNumber('2')">2</button>
+      <button onclick="playClick(); appendNumber('3')">3</button>
+      <button class="orange" onclick="playClick(); setOperation('+')">+</button>
+
+      <button class="wide" onclick="playClick(); appendNumber('0')">0</button>
+      <button onclick="playClick(); appendDecimal()">.</button>
+      <button class="orange" onclick="playClick(); calculate()">=</button>
+    </div>
+  </div>
+
+  <script>
+    let current = '0';
+    let operator = null;
+    let prev = null;
+
+    function updateDisplay() {
+      document.getElementById('display').textContent = current;
+    }
+
+    function clearDisplay() {
+      current = '0';
+      prev = null;
+      operator = null;
+      updateDisplay();
+    }
+
+    function appendNumber(num) {
+      if (current === '0') {
+        current = num;
+      } else {
+        current += num;
+      }
+      updateDisplay();
+    }
+
+    function appendDecimal() {
+      if (!current.includes('.')) {
+        current += '.';
+      }
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      current = (parseFloat(current) * -1).toString();
+      updateDisplay();
+    }
+
+    function percent() {
+      current = (parseFloat(current) / 100).toString();
+      updateDisplay();
+    }
+
+    function setOperation(op) {
+      if (operator !== null) {
+        calculate();
+      }
+      prev = current;
+      current = '0';
+      operator = op;
+    }
+
+    function calculate() {
+      if (operator === null || prev === null) return;
+      const a = parseFloat(prev);
+      const b = parseFloat(current);
+      let result;
+      switch (operator) {
+        case '+': result = a + b; break;
+        case '-': result = a - b; break;
+        case '*': result = a * b; break;
+        case '/': result = b !== 0 ? a / b : 'Error'; break;
+      }
+      current = result.toString();
+      operator = null;
+      prev = null;
+      updateDisplay();
+    }
+
+    function playClick() {
+      const audio = document.getElementById('click-sound');
+      audio.currentTime = 0;
+      audio.play();
+    }
+  </script>
+</body>
+</html>
